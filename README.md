@@ -1,181 +1,346 @@
-# get_storage_wasm
+# getxtra_storage
 
-> **Note**: This package is based on the original [get_storage](https://pub.dev/packages/get_storage) package by [Jonny Borges](https://github.com/jonataslaw/get_storage), with additional features and improvements including WebAssembly support.
+[![pub package](https://img.shields.io/pub/v/getxtra_storage.svg)](https://pub.dev)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A fast, extra light and synchronous key-value in memory, which backs up data to disk at each operation.
-It is written entirely in Dart and easily integrates with Get framework of Flutter.
+A fast, lightweight, synchronous key-value storage solution for Flutter and Dart applications, built for the **GetXtra ecosystem**.
 
-Supports Android, iOS, Web, Mac, Linux, and fuchsia and Windows**. 
-Can store String, int, double, Map and List
+`getxtra_storage` is the community-maintained continuation of the original `get_storage` package, modernized for current Flutter and Dart releases, enhanced Web/WASM compatibility, and future AI-assisted application development.
 
-## 🚀 WebAssembly (WASM) Support
-GetStorage now fully supports **WebAssembly compilation** for Flutter web apps! This enables:
-- **Up to 3x faster execution** compared to JavaScript compilation
-- **Better memory efficiency** and performance
-- **Future-proof compatibility** with WebAssembly-first Flutter web
+It preserves the familiar GetStorage API while replacing legacy GetX dependencies with **GetXtra** and incorporating modern platform support improvements.
 
-### Building with WebAssembly:
+---
+
+## Why getxtra_storage?
+
+The original GetStorage became one of the most widely used lightweight storage solutions in the Flutter ecosystem because of its simplicity:
+
+```dart
+box.write('username', 'tabitha');
+print(box.read('username'));
+```
+
+No database.
+No schema.
+No migrations.
+Just fast in-memory storage with persistent disk backup.
+
+`getxtra_storage` continues that philosophy while adding:
+
+* ✅ GetXtra compatibility
+* ✅ Modern Dart and Flutter support
+* ✅ WebAssembly (WASM) compatibility
+* ✅ Cross-platform storage implementations
+* ✅ Backward-compatible GetStorage APIs
+* ✅ Community-driven maintenance
+* ✅ AI-first ecosystem alignment
+
+---
+
+## Features
+
+### Fast Memory Access
+
+Values are written immediately to memory and become available synchronously:
+
+```dart
+box.write('theme', 'dark');
+final theme = box.read('theme');
+```
+
+### Persistent Storage
+
+Changes are automatically persisted to the platform storage backend.
+
+### Multiple Containers
+
+Create isolated storage areas:
+
+```dart
+final userBox = GetStorage('user');
+final cacheBox = GetStorage('cache');
+```
+
+### Reactive Listeners
+
+Listen to storage changes:
+
+```dart
+box.listen(() {
+  print('Storage changed');
+});
+```
+
+Or listen to a specific key:
+
+```dart
+box.listenKey('username', (value) {
+  print('Username updated: $value');
+});
+```
+
+### Web & WASM Ready
+
+Supports Flutter Web and modern WebAssembly compilation targets:
+
 ```bash
-# Build your Flutter web app with WebAssembly support
 flutter build web --release --wasm
 ```
 
-The package automatically uses WebAssembly-compatible storage implementation when compiled with WASM, while maintaining full compatibility with regular JavaScript builds.
+### AI-Friendly Architecture
 
-### Add to your pubspec:
-```
+Designed to integrate naturally into:
+
+* AI-generated Flutter applications
+* Agentic development workflows
+* Code generation systems
+* Runtime configuration platforms
+* The Tabitha and GetXtra ecosystems
+
+---
+
+# Installation
+
+Add the package to your `pubspec.yaml`:
+
+```yaml
 dependencies:
-  get_storage_wasm:
-```
-### Install it
-
-You can install packages from the command line:
-
-with `Flutter`:
-
-```css
-$  flutter packages get
+  getxtra_storage:
 ```
 
-## About this Package
+Then run:
 
-This package (`get_storage_wasm`) is based on the original [get_storage](https://pub.dev/packages/get_storage) package created by [Jonny Borges](https://github.com/jonataslaw). 
+```bash
+flutter pub get
+```
 
-### Key Improvements:
-- ✅ **WebAssembly (WASM) Support** - Full compatibility with Flutter's WASM compilation
-- ✅ **Enhanced Performance** - Optimized for modern Flutter versions
-- ✅ **Updated Dependencies** - Compatible with latest Flutter and Dart versions
-- ✅ **Improved Documentation** - Better examples and usage guides
+---
 
-### Credits
-- Original package: [get_storage](https://pub.dev/packages/get_storage) by [Jonny Borges](https://github.com/jonataslaw)
-- Maintained by: [lcw99](https://github.com/lcw99)
+# Import
 
-### Import it
-
-Now in your `Dart` code, you can use: 
-
-````dart
-import 'package:get_storage_wasm/get_storage_wasm.dart';
-````
-
-### Initialize storage driver with await:
 ```dart
-main() async {
+import 'package:getxtra_storage/getxtra_storage.dart';
+```
+
+---
+
+# Initialization
+
+Initialize storage before using it:
+
+```dart
+Future<void> main() async {
   await GetStorage.init();
-  runApp(App());
+
+  runApp(const MyApp());
 }
 ```
-#### use GetStorage through an instance or use directly `GetStorage().read('key')`
+
+---
+
+# Basic Usage
+
+Create a storage instance:
+
 ```dart
 final box = GetStorage();
 ```
-#### To write information you must use `write` :
+
+Write a value:
+
 ```dart
-box.write('quote', 'GetX is the best');
+await box.write('quote', 'GetXtra is awesome');
 ```
 
-#### To read values you use `read`:
-```dart
-print(box.read('quote'));
-// out: GetX is the best
-
-```
-#### To remove a key, you can use `remove`:
+Read a value:
 
 ```dart
-box.remove('quote');
+final quote = box.read<String>('quote');
 ```
 
-#### To listen changes you can use `listen`:
-```dart
-Function? disposeListen;
-disposeListen = box.listen((){
-  print('box changed');
-});
-```
-#### If you subscribe to events, be sure to dispose them when using:
-```dart
-disposeListen?.call();
-```
-#### To listen changes on key you can use `listenKey`:
+Remove a value:
 
 ```dart
-box.listenKey('key', (value){
-  print('new key is $value');
-});
+await box.remove('quote');
 ```
 
-#### To erase your container:
+Erase an entire container:
+
 ```dart
-box.erase();
+await box.erase();
 ```
 
-#### If you want to create different containers, simply give it a name. You can listen to specific containers, and also delete them.
+Check if data exists:
 
 ```dart
-GetStorage g = GetStorage('MyStorage');
+if (box.hasData('quote')) {
+  print('Found quote');
+}
 ```
 
-#### To initialize specific container:
+---
+
+# Multiple Containers
+
 ```dart
-await GetStorage.init('MyStorage');
+await GetStorage.init('settings');
+
+final settings = GetStorage('settings');
+
+await settings.write('theme', 'dark');
 ```
 
-## SharedPreferences Implementation
-```dart
-class MyPref {
-  static final _otherBox = () => GetStorage('MyPref');
+---
 
+# ReadWriteValue Helper
+
+```dart
+class Preferences {
   final username = ''.val('username');
   final age = 0.val('age');
-  final price = 1000.val('price', getBox: _otherBox);
-
-  // or
-  final username2 = ReadWriteValue('username', '');
-  final age2 = ReadWriteValue('age', 0);
-  final price2 = ReadWriteValue('price', '', _otherBox);
-}
-
-...
-
-void updateAge() {
-  final age = 0.val('age');
-  // or 
-  final age = ReadWriteValue('age', 0, () => box);
-  // or 
-  final age = Get.find<MyPref>().age;
-
-  age.val = 1; // will save to box
-  final realAge = age.val; // will read from box
 }
 ```
 
+Usage:
 
-## Benchmark Result:
-**GetStorage is not fast, it is absurdly fast for being memory-based. All of his operations are instantaneous. A backup of each operation is placed in a Container on the disk. Each container has its own file.**
+```dart
+final prefs = Preferences();
 
-![](delete.png)
-![](write.png)
-![](read.png)
+prefs.username.val = 'Tabitha';
 
-## What GetStorage is:
-Persistent key/value storage for Android, iOS, Web, Linux, Mac and Fuchsia and Windows, that combines fast memory access with persistent storage. **Optimized for WebAssembly** when building Flutter web apps with `--wasm` flag for enhanced performance.
-## What GetStorage is NOT:
-A database. Get is super compact to offer you a solution ultra-light, high-speed read/write storage to work synchronously. If you want to store data persistently on disk with immediate memory access, use it, if you want a database, with indexing and specific disk storage tools, there are incredible solutions that are already available, like Hive and Sqflite/Moor.
+print(prefs.username.val);
+```
 
+---
 
-As soon as you declare "write" the file is immediately written in memory and can now be accessed immediately with `box.read()`. You can also wait for the callback that it was written to disk using `await box.write()`.
+# Supported Platforms
 
-## When to use GetStorage:
-  - simple Maps storage.
-  - cache of http requests
-  - storage of simple user information.
-  - simple and persistent state storage
-  - any situation you currently use sharedPreferences.
+| Platform | Supported |
+| -------- | --------- |
+| Android  | ✅         |
+| iOS      | ✅         |
+| macOS    | ✅         |
+| Windows  | ✅         |
+| Linux    | ✅         |
+| Web      | ✅         |
+| WASM     | ✅         |
 
-## When not to use GetStorage:
-  - you need indexes.
-  -  when you need to always check if the file was written to the storage disk before starting another operation (storage in memory is done instantly and can be read instantly with box.read(), and the backup to disk is done in the background. To make sure the backup is complete, you can use await, but if you need to call await all the time, it makes no sense you are using memory storage).
+---
 
-### You can use this lib even as a modest persistent state manager using Getx SimpleBuilder
+# What getxtra_storage Is
+
+A lightweight persistent storage layer that combines:
+
+* Fast in-memory access
+* Persistent platform storage
+* Simple API surface
+* Minimal dependencies
+* Reactive change notifications
+
+Perfect for:
+
+* Application settings
+* User preferences
+* Local caching
+* Session data
+* Lightweight state persistence
+
+---
+
+# What getxtra_storage Is Not
+
+`getxtra_storage` is not intended to replace a full database.
+
+If your application requires:
+
+* Complex querying
+* Relationships
+* Indexing
+* Large-scale datasets
+* Offline-first synchronization
+
+Consider solutions such as:
+
+* Drift
+* Isar
+* Hive
+* SQLite
+
+---
+
+# Migration from get_storage
+
+Most applications can migrate with minimal changes.
+
+### Before
+
+```yaml
+dependencies:
+  get_storage:
+```
+
+```dart
+import 'package:get_storage/get_storage.dart';
+```
+
+### After
+
+```yaml
+dependencies:
+  getxtra_storage:
+```
+
+```dart
+import 'package:getxtra_storage/getxtra_storage.dart';
+```
+
+The public API remains intentionally familiar.
+
+---
+
+# Relationship to GetXtra
+
+`getxtra_storage` is the official storage package for the GetXtra ecosystem.
+
+It aims to provide a stable migration path for developers moving from GetX/GetStorage while embracing modern Flutter development practices and future ecosystem improvements.
+
+Learn more:
+
+* GetXtra
+* Tabitha
+* Fairmount & Charles
+
+---
+
+# Acknowledgements
+
+This package would not exist without the work of the Flutter community members who built and maintained the projects that came before it.
+
+Special thanks to:
+
+### Jonny Borges (jonataslaw)
+
+Creator of the original:
+
+* get_storage
+* GetX
+
+### lcw99
+
+Maintainer of:
+
+* get_storage_wasm
+
+whose WebAssembly work helped modernize the storage implementation for future Flutter Web targets.
+
+### Contributors
+
+Thank you to every contributor, tester, maintainer, issue reporter, and community member who helped evolve these projects over the years.
+
+---
+
+# License
+
+MIT License.
+
+Please retain all applicable copyright notices and attribution from upstream projects.
