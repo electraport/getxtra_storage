@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
   getxtra:
     git:
-      url: https://github.com/gauravmehta13/getxtra.git
+      url: git@github.com:gauravmehta13/getxtra.git
       ref: master
   path_provider: ^2.1.5
   #platform_info: ^3.0.0-nullsafety.1
